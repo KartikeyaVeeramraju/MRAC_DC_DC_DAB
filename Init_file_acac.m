@@ -1,0 +1,65 @@
+close all
+ clear all
+  clc
+  
+
+  Vin = 270; %input voltage rms
+  fg = 60;
+  Vout = 28; 
+  Vout1 = 28;%target output voltage 1
+  Vout2 = 18;%taget output voltage 2
+  P1 = 1e+3; % power demand 1
+  P2 = 1e+3; %power demand 2
+  n_pri = 1; %primary turns
+  n_sec = 5; %secondary turns
+  %Llk = 50e-6*(n_pri/n_sec)^2; %leakage inductance
+  Llk = 10e-6;
+  Co = 1000e-6; %output capacitance
+
+  f = 30e+3; %switching frequency
+  Rload1 = Vout1^2/P1; %P1; Vout1 load resistance required 
+  Rload2 = Vout1^2/(P2); %P2; Vout2 load resistance required
+  %Rload = 10;
+  Rc = 4e-3; %Capacitance ESR
+  Rt = 4e-3; %Leakage inductance ESR
+  
+  gamma = 0.5; %controller gain parameter; Required value is somewhere around 0.04
+ % Higher values of gamma lead to faster parametric convergence in general 
+  
+  %ref model
+  am = 250; %reference model am
+  bm = 250; %reference model bm
+  
+  ar_0 = 0; %ar parameter estimate's inital state
+  ax_0 = 0; %ax parameter estimate's initial state
+  
+  
+  
+  
+open_loop = 1; 
+closed_loop = 0;
+
+%mode = open_loop;
+mode = closed_loop;
+
+phi_init = 15;
+
+activate_controller_time = 0;
+
+Ro = (Rload1*Rt + Rc*Rt + Rload1*Rc)/(Rload1 + Rc);
+Xl = 2*pi*f*Llk;
+atan(Xl/Ro) %this value must be around pi/2 otherwise affine model f(x)+ g(x)u
+%will not be as simple as the one given in the main paper
+%sim('DAB.slx');
+
+voltage_step_time = 0.09;
+load_step_time = 0.09;
+TSIM = 5/fg;
+min_step_size = 5e-8;
+
+sim('ACAC_DAB_MRAC.slx');
+
+run('plot_sim_data.m')
+
+  
+  

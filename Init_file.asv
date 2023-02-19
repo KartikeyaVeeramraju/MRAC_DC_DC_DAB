@@ -1,0 +1,60 @@
+close all
+ clear all
+  clc
+  
+
+  Vin = 270; %input voltage
+  Vout = 28; 
+  Vout1 = 28;%target output voltage 1
+  Vout2 = 18;%taget output voltage 2
+  P1 = 2e+3; % power demand 1
+  P2 = 1e+3; %power demand 2
+  n_pri = 1; %primary turns
+  n_sec = 5; %secondary turns
+  Llk = 15e-6*(n_pri/n_sec)^2; %leakage inductance
+  Co = 3e-3; %output capacitance
+
+  f = 50e+3; %switching frequency
+  Rload1 = Vout1^2/P1; %P1; Vout1 load resistance required 
+  Rload2 = Vout2^2/(P2); %P2; Vout2 load resistance required
+  %Rload = 10;
+  Rc = 4e-3; %Capacitance ESR
+  Rt = 4e-3; %Leakage inductance ESR
+  
+  gamma = 0.06; %
+  
+  %ref model
+  am = 581.93;
+  bm = 581.93;
+  
+  ar_0 = 0;
+  ax_0 = 0;
+  
+  
+  
+  
+open_loop = 1;
+closed_loop = 0;
+
+%mode = open_loop;
+mode = closed_loop;
+
+phi_init = 15;
+
+activate_controller_time = 0;
+
+Ro = (Rload1*Rt + Rc*Rt + Rload1*Rc)/(Rload1 + Rc);
+Xl = 2*pi*f*Llk;
+atan(Xl/Ro)
+%sim('DAB.slx');
+
+voltage_step_time = 0.02;
+load_step_time = 0.06;
+TSIM = 0.1;
+min_step_size = 4e-8;
+
+sim('DAB_MRAC_new.slx');
+
+
+  
+  
